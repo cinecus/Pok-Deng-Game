@@ -78,48 +78,57 @@ const countPoint = (card) => {
 }
 
 //รับไพ่บนมือของคุณและเจ้ามือมานับเป็นแต้ม
-const CheckScore = (your_hand, dealer_hand) => {
-    const your = countPoint(your_hand)
-    const dealer = countPoint(dealer_hand)
-
-    console.log(`You got ${your_hand[0]}, ${your_hand[1]}`) //แสดงบน cmd
-    console.log(`The dealer got ${dealer_hand[0]}, ${dealer_hand[1]}`) //แสดงบน cmd
+const CheckScore = (player_hand) => {
+    //const your = countPoint(your_hand)
+    //const dealer = countPoint(dealer_hand)
+    const score = player_hand.map(el => countPoint(el))
+    //console.log(`You got ${your_hand[0]}, ${your_hand[1]}`) //แสดงบน cmd
+    //console.log(`The dealer got ${dealer_hand[0]}, ${dealer_hand[1]}`) //แสดงบน cmd
 
     // console.log('your_hand', your_hand)
     // console.log('dealer_hand', dealer_hand)
     // console.log('your', your)
     // console.log('dealer', dealer)
-    return { your, dealer }
+    return score
 }
 
 //ทำการแจกไพ่ให้ เจ้ามือ กับ คุณ แล้วเทียบแต้มกัน ถ้าเสมอ ไม่เกิดอะไรขึ้น ถ้าชนะ wallet จะบวกเงินตามที่ bet ถ้าแพ้ เสีย bet
-const Turn = (bet) => {
+const Turn = (bet, player) => {
     let your_hand = []
     let dealer_hand = []
 
+    let player_hand = []
     const new_deck = new Deck()
 
-    for (let i = 0; i < 4; i++) {
-        const deal = new_deck.deal()
-        if (i % 2 === 0) {
-            your_hand.push(deal)
-        } else {
-            dealer_hand.push(deal)
-        }
+    for (let i = 0; i < player; i++) {
+        const deal_1 = new_deck.deal()
+        const deal_2 = new_deck.deal()
+        player_hand.push([deal_1, deal_2])
+        // if (i % 2 === 0) {
+        //     your_hand.push(deal)
+        // } else {
+        //     dealer_hand.push(deal)
+        // }
     }
     //console.log('new_deck.length', new_deck.deck.length)
 
-    const { your, dealer } = CheckScore(your_hand, dealer_hand)
+    const player_score = CheckScore(player_hand)
 
-    if (your.value > dealer.value) {
-        wallet += +bet
-        console.log(`You won!!!, received ${bet} chips`) //แสดงบน cmd
-    } else if (your.value < dealer.value) {
-        wallet -= +bet
-        console.log(`You lose!!!, lost ${bet} chips`) //แสดงบน cmd
-    } else {
-        console.log(`You tie!!!`) //แสดงบน cmd
+    for (let i = 0; i < player_score.length; i++) {
+        console.log(`player ${i} score : ${player_score[i].value}`)
+
     }
+
+
+    // if (your.value > dealer.value) {
+    //     wallet += +bet
+    //     console.log(`You won!!!, received ${bet} chips`) //แสดงบน cmd
+    // } else if (your.value < dealer.value) {
+    //     wallet -= +bet
+    //     console.log(`You lose!!!, lost ${bet} chips`) //แสดงบน cmd
+    // } else {
+    //     console.log(`You tie!!!`) //แสดงบน cmd
+    // }
 }
 
 
@@ -131,8 +140,13 @@ const Start = async () => {
             name: 'bet',
             message: 'Please put your bet?'
         })
+        const { player } = await inquirer.prompt({
+            type: 'input',
+            name: 'player',
+            message: 'How many player?'
+        })
         console.log(bet)
-        await Turn(bet)
+        await Turn(bet, player)
         const { confirm } = await inquirer.prompt({
             type: 'list',
             name: 'confirm',
